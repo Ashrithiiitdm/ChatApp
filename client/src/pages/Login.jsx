@@ -1,5 +1,3 @@
-"use client";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +5,15 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import axios from "@/utils/axios.js";
+import { useAppStore } from "@/store/app.js";
 
 export default function Login() {
+	const navigate = useNavigate();
+
+	const { setUserInfo } = useAppStore();
 	const [showPassword, setShowPassword] = useState(false);
 	const [activeTab, setActiveTab] = useState("login");
 	const [email, setEmail] = useState("");
@@ -17,9 +21,92 @@ export default function Login() {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [fullName, setFullName] = useState("");
 
-	const handleSignup = (e) => {};
+	const validateLogin = () => {
+		if (!email.length) {
+			toast.error("Email is required");
+			return false;
+		}
 
-	const handleLogin = (e) => {};
+		if (!password.length) {
+			toast.error("Password is required");
+			return false;
+		}
+
+		return true;
+	};
+
+	const validateSignUp = () => {
+		if (!email.length) {
+			toast.error("Email is required");
+			return false;
+		}
+
+		if (!password.length) {
+			toast.error("Password is required");
+			return false;
+		}
+
+		if (password !== confirmPassword) {
+			toast.error("Passwords do not match");
+			return false;
+		}
+
+		return true;
+	};
+
+	const handleSignup = async (e) => {
+		e.preventDefault();
+		if (!validateSignUp()) {
+			return;
+		}
+
+		try {
+			const response = await axios.post(
+				"/auth/signup",
+				{ email, password },
+				{ withCredentials: true }
+			);
+			console.log(response);
+
+			if (response.status === 201) {
+				setUserInfo(response.data.user);
+				toast.success("Signup successful");
+				navigate("/profile");
+			}
+		} catch (err) {
+			console.log(err);
+			toast.error("Signup failed. Please try again");
+		}
+	};
+
+	const handleLogin = async (e) => {
+		e.preventDefault();
+		if (!validateLogin()) {
+			return;
+		}
+
+		try {
+			const response = await axios.post(
+				"/auth/login",
+				{ email, password },
+				{ withCredentials: true }
+			);
+
+			if (response.data.user.user_id) {
+				toast.success("Login successful");
+				console.log(response.data.user);
+				setUserInfo(response.data.user);
+				if (response.data.user.profileSetup) {
+					navigate("/chat");
+				} else {
+					navigate("/profile");
+				}
+			}
+		} catch (err) {
+			console.log(err);
+			toast.error("Login failed. Please try again");
+		}
+	};
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4">
@@ -58,7 +145,7 @@ export default function Login() {
 
 							{/* Login Form */}
 							<TabsContent value="login" className="mt-0">
-								<form className="space-y-6" onClick={handleLogin}>
+								<form className="space-y-6" onSubmit={handleLogin}>
 									<div className="space-y-4">
 										<div className="space-y-2">
 											<Label htmlFor="email">Email</Label>
@@ -128,23 +215,8 @@ export default function Login() {
 
 							{/* Signup Form */}
 							<TabsContent value="signup" className="mt-0">
-								<form className="space-y-6" onClick={handleSignup}>
+								<form className="space-y-6" onSubmit={handleSignup}>
 									<div className="space-y-4">
-										<div className="space-y-2">
-											<Label htmlFor="full-name">Full Name</Label>
-											<div className="relative">
-												<User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-												<Input
-													id="full-name"
-													type="text"
-													placeholder="Enter your full name"
-													className="pl-10"
-													value={fullName}
-													onChange={(e) => setFullName(e.target.value)}
-												/>
-											</div>
-										</div>
-
 										<div className="space-y-2">
 											<Label htmlFor="signup-email">Email</Label>
 											<div className="relative">
