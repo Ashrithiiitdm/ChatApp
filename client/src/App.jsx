@@ -7,20 +7,20 @@ import Profile from "./pages/Profile.jsx";
 import { useAppStore } from "./store/app";
 import axios from "@/utils/axios.js";
 
-const PrivateRoute = ({ Children }) => {
+const PrivateRoute = ({ children }) => {
 	const { userInfo } = useAppStore();
 
 	const isLoggedIn = !!userInfo;
 
-	return isLoggedIn ? Children : <Navigate to="/auth" />;
+	return isLoggedIn ? children : <Navigate to="/auth" />;
 };
 
-const AuthRoute = ({ Children }) => {
+const AuthRoute = ({ children }) => {
 	const { userInfo } = useAppStore();
 
 	const isLoggedIn = !!userInfo;
 
-	return isLoggedIn ? <Navigate to="/chat" /> : Children;
+	return isLoggedIn ? <Navigate to="/chat" /> : children;
 };
 
 export default function App() {
@@ -30,14 +30,15 @@ export default function App() {
 	useEffect(() => {
 		const getUserData = async () => {
 			try {
-				const response = await axios.get("/auth/userInfo", {
-					withCredentials: true,
-				});
-				console.log(response);
-				if (
-					(response.success === 200 || response.success === 201) &&
-					response.data.user_id
-				) {
+				console.log("In getUserData");
+				const response = await axios.get(
+					"http://localhost:8080/auth/userInfo",
+					{
+						withCredentials: true,
+					}
+				);
+				console.log("Response in useEffect", response);
+				if (response.success === 200 && response.data.user_id) {
 					console.log(response.data);
 					setUserInfo(response.data);
 				} else {

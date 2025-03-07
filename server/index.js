@@ -13,13 +13,19 @@ connectDB();
 app.use(express.json());
 app.use(
 	cors({
-		origin: [process.env.ORIGIN],
+		origin: "http://localhost:5173",
 		methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 		credentials: true,
 	})
 );
 
-app.use(cookieParser());
+app.use(
+	cookieParser({
+		secure: true,
+		sameSite: "None",
+	
+	})
+);
 
 app.use("/auth", authRouter);
 

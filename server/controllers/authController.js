@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 const signToken = (email, user_id) => {
+	console.log("In signToken", email, user_id);
 	return jwt.sign({ email, user_id }, process.env.JWT_SECRET, {
 		expiresIn: maxAge,
 	});
@@ -13,7 +14,7 @@ const signToken = (email, user_id) => {
 export const regUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
-		console.log(email, password);
+		console.log("In regUser:", email, password);
 
 		if (!email) {
 			return res.status(400).json({
@@ -55,16 +56,17 @@ export const regUser = async (req, res, next) => {
 
 		const cookieOptions = {
 			maxAge,
-			secure: process.env.NODE_ENV === "production", // false in development (HTTP)
-			sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+			secure: true, // false in development (HTTP)
+			sameSite: "None",
+			httpOnly: true,
 		};
 
-		res.cookie("jwt", signToken(email, user._id), cookieOptions);
+		res.cookie("jwt", signToken(email, user.id), cookieOptions);
 		return res.status(201).json({
 			message: "User created successfully",
 			user: {
 				email: user.email,
-				user_id: user._id,
+				user_id: user.id,
 				profileSetup: user.profileSetup,
 			},
 		});
@@ -101,29 +103,30 @@ export const loginUser = async (req, res, next) => {
 		}
 
 		const match = await bcrypt.compare(password, user.password);
-
+		console.log("Match", match);
 		if (!match) {
 			return res.status(401).json({
 				message: "Invalid credentials",
 			});
 		}
 
-		console.log("id", user._id);
+		console.log("id", user.id);
 
 		// In your login/registration endpoint:
 		const cookieOptions = {
 			maxAge,
-			secure: process.env.NODE_ENV === "production", // false in development (HTTP)
-			sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+			secure: true, // false in development (HTTP)
+			sameSite: "None",
+			httpOnly: true,
 		};
 
-		res.cookie("jwt", signToken(email, user._id), cookieOptions);
-
+		const p = res.cookie("jwt", signToken(email, user.id), cookieOptions);
+		//console.log("P", p);
 		return res.status(200).json({
 			message: "User logged in successfully",
 			user: {
 				email: user.email,
-				user_id: user._id,
+				user_id: user.id,
 				profileSetup: user.profileSetup,
 				first_name: user.first_name,
 				last_name: user.last_name,
@@ -141,7 +144,10 @@ export const loginUser = async (req, res, next) => {
 
 export const getUserInfo = async (req, res, next) => {
 	try {
-		console.log(req._id);
+		console.log("Inside getUserInfo");
+		//console.log(req.cookies);
+		//console.log(req.cookies.jwt);
+		console.log("Request body", req.user_id);
 		const user = await User.findById(req.user_id);
 
 		if (!user) {
@@ -152,7 +158,7 @@ export const getUserInfo = async (req, res, next) => {
 
 		return res.status(200).json({
 			email: user.email,
-			user_id: user._id,
+			user_id: user.id,
 			profileSetup: user.profileSetup,
 			first_name: user.first_name,
 			last_name: user.last_name,
