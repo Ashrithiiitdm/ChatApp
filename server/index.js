@@ -19,6 +19,7 @@ app.use(
 	})
 );
 
+app.use("/uploads/profiles", express.static("uploads/profiles"));
 app.use(
 	cookieParser({
 		secure: true,

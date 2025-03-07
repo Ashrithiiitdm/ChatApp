@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
 import validator from "validator";
 import bcrypt from "bcrypt";
+import { renameSync, unlinkSync } from "fs";
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 const signToken = (email, user_id) => {
@@ -164,6 +165,135 @@ export const getUserInfo = async (req, res, next) => {
 			last_name: user.last_name,
 			image: user.image,
 			color: user.color,
+		});
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({
+			message: "Internal server error",
+		});
+	}
+};
+
+export const updateProfile = async (req, res, next) => {
+	try {
+		const { user_id } = req;
+		const { firstName, lastName, color } = req.body;
+
+		if (!firstName) {
+			return res.status(400).json({
+				message: "First name is required",
+			});
+		}
+
+		if (!lastName) {
+			return res.status(400).json({
+				message: "Last name is required",
+			});
+		}
+
+		if (!color) {
+			return res.status(400).json({
+				message: "Color is required",
+			});
+		}
+
+		const user = await User.findByIdAndUpdate(
+			user_id,
+			{
+				first_name: firstName,
+				last_name: lastName,
+				color,
+				profileSetup: true,
+			},
+			{ new: true, runValidators: true }
+		);
+
+		if (!user) {
+			return res.status(404).json({
+				message: "User not found",
+			});
+		}
+
+		return res.status(200).json({
+			email: user.email,
+			user_id: user.id,
+			profileSetup: user.profileSetup,
+			first_name: user.first_name,
+			last_name: user.last_name,
+			image: user.image,
+			color: user.color,
+		});
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({
+			message: "Internal server error",
+		});
+	}
+};
+
+export const updateProfileImage = async (req, res, next) => {
+	try {
+		if (!req.file) {
+			return res.status(400).json({
+				message: "File is required",
+			});
+		}
+
+		const date = Date.now();
+		let fileName = "uploads/profiles/" + date + req.file.originalname;
+		renameSync(req.file.path, fileName);
+
+		const updateUser = await User.findByIdAndUpdate(
+			req.user_id,
+			{
+				image: fileName,
+			},
+			{ new: true, runValidators: true }
+		);
+
+		if (!updateUser) {
+			return res.status(404).json({
+				message: "User not found",
+			});
+		}
+
+		return res.status(200).json({
+			email: updateUser.email,
+			user_id: updateUser.id,
+			profileSetup: updateUser.profileSetup,
+			first_name: updateUser.first_name,
+			last_name: updateUser.last_name,
+			image: updateUser.image,
+			color: updateUser.color,
+		});
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({
+			message: "Internal server error",
+		});
+	}
+};
+
+export const removeProfileImage = async (req, res, next) => {
+	try {
+		const { user_id } = req;
+		const user = await User.findById(user_id);
+		if (!user) {
+			return res.status(404).json({
+				message: "User not found",
+			});
+		}
+
+		if (user.image) {
+			unlinkSync(user.image);
+		}
+
+		user.image = null;
+
+		await user.save();
+
+		return res.status(200).json({
+			message: "Profile image removed successfully",
 		});
 	} catch (err) {
 		console.log(err);

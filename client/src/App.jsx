@@ -38,7 +38,7 @@ export default function App() {
 					}
 				);
 				console.log("Response in useEffect", response);
-				if (response.success === 200 && response.data.user_id) {
+				if (response.status === 200 && response.data.user_id) {
 					console.log(response.data);
 					setUserInfo(response.data);
 				} else {
@@ -92,7 +92,7 @@ export default function App() {
 					}
 				/>
 
-				<Route path="*" element={<Navigate to="/auth" />} />
+				{/* <Route path="*" element={<Navigate to="/auth" />} /> */}
 			</Routes>
 		</BrowserRouter>
 	);
