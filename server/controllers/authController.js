@@ -302,3 +302,17 @@ export const removeProfileImage = async (req, res, next) => {
 		});
 	}
 };
+
+export const logOutUser = async (req, res, next) => {
+	try {
+		res.cookie("jwt", "", { maxAge: 1, secure: true, sameSite: "None" });
+		return res.status(200).json({
+			message: "User logged out successfully",
+		});
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({
+			message: "Internal server error",
+		});
+	}
+};

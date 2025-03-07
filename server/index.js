@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.js";
+import contactRoutes from "./routes/contact.js";
 import connectDB from "./db.js";
 
 dotenv.config();
@@ -24,11 +25,11 @@ app.use(
 	cookieParser({
 		secure: true,
 		sameSite: "None",
-	
 	})
 );
 
 app.use("/auth", authRouter);
+app.use("/contacts", contactRoutes);
 
 const port = process.env.PORT || 5000;
 
