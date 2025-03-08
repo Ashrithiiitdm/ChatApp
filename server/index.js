@@ -6,6 +6,7 @@ import authRouter from "./routes/auth.js";
 import contactRoutes from "./routes/contact.js";
 import connectDB from "./db.js";
 import { setUpSocket } from "./socket.js";
+import msgRouter from "./routes/messages.js";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(
 
 app.use("/auth", authRouter);
 app.use("/contacts", contactRoutes);
+app.use("/messages", msgRouter);
 
 const port = process.env.PORT || 5000;
 

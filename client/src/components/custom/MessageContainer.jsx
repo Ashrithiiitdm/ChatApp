@@ -1,11 +1,40 @@
-import { useAppStore } from "@/store/app";
+import { useAppStore } from "@/store/app.js";
+import axios from "@/utils/axios.js";
 import moment from "moment";
 import React, { useEffect, useRef } from "react";
 
 export default function MessageContainer() {
 	const scrollRef = useRef(null);
-	const { selectedChatType, selectedChatData, selectedChatMessages, userInfo } =
-		useAppStore();
+	const {
+		selectedChatType,
+		selectedChatData,
+		selectedChatMessages,
+		userInfo,
+		setSelectedChatMessages,
+	} = useAppStore();
+
+	useEffect(() => {
+		const getMessages = async () => {
+			try {
+				const response = await axios.post(
+					"/messages/getMessages",
+					{ user_id: selectedChatData._id },
+					{ withCredentials: true }
+				);
+
+				if (response.status === 200 && response.data.messages) {
+					setSelectedChatMessages(response.data.messages);	
+				}
+			} catch (err) {
+				console.log(err);
+			}
+		};
+		if (selectedChatData._id) {
+			if (selectedChatType === "contact") {
+				getMessages();
+			}
+		}
+	}, [selectedChatData, selectedChatType, selectedChatMessages]);
 
 	useEffect(() => {
 		if (scrollRef.current) {
@@ -14,13 +43,11 @@ export default function MessageContainer() {
 	}, [selectedChatMessages]);
 
 	const renderDMMessages = (message) => {
-		console.log("Message: ", message);
+		// console.log("Message: ", message);
 		return (
 			<div
 				className={`${
-					message.sender === selectedChatData._id
-						? "text-left"
-						: "text-right"
+					message.sender === selectedChatData._id ? "text-left" : "text-right"
 				}`}
 			>
 				{message.message_type === "text" && (
@@ -44,7 +71,7 @@ export default function MessageContainer() {
 	const renderMessages = () => {
 		let lastDate = null;
 		return selectedChatMessages.map((message, index) => {
-			const messageDate = moment(message.timestamp).format("YYYY-MM-DD"); 
+			const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
 			const showDate = messageDate !== lastDate;
 			lastDate = messageDate;
 
