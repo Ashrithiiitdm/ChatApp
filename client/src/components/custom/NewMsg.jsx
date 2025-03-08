@@ -12,24 +12,22 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog.jsx";
-import { Input } from "../ui/input";
+import { Input } from "../ui/input.jsx";
 import axios from "@/utils/axios.js";
-import { ScrollArea } from "../ui/scroll-area";
-import { Avatar, AvatarImage } from "../ui/avatar";
-import { getColor } from "@/lib/utils";
+import { ScrollArea } from "../ui/scroll-area.jsx";
+import { Avatar, AvatarImage } from "../ui/avatar.jsx";
+import { getColor } from "@/lib/utils.js";
+import { useAppStore } from "@/store/app.js";
 
 export default function NewMsg() {
+	const { setSelectedChatType, setSelectedChatData } = useAppStore();
 	const [openNewContactModal, setOpenNewContactModal] = useState(false);
-
 	const [searchedContacts, setSearchedContacts] = useState([]);
 
 	const searchContacts = async (contact) => {
 		try {
-			console.log(contact);
 			if (contact.length > 0) {
-				console.log("Inside searchContacts", contact);
 				const response = await axios.post(
 					"/contacts/searchContacts",
 					{ contact },
@@ -39,12 +37,18 @@ export default function NewMsg() {
 					setSearchedContacts(response.data.contacts);
 				}
 			} else {
-				console.log("Else block");
 				setSearchedContacts([]);
 			}
 		} catch (err) {
 			console.log(err);
 		}
+	};
+
+	const selectNewContact = (contact) => {
+		setOpenNewContactModal(false);
+		setSelectedChatType("contact");
+		setSelectedChatData(contact);
+		setSearchedContacts([]);
 	};
 
 	return (
@@ -54,7 +58,7 @@ export default function NewMsg() {
 					<TooltipTrigger>
 						<FaPlus
 							onClick={() => setOpenNewContactModal(true)}
-							className="text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all duration-300 "
+							className="text-neutral-400 font-light text-opacity-90 text-start hover:text-neutral-100 cursor-pointer transition-all duration-300"
 						/>
 					</TooltipTrigger>
 					<TooltipContent className="bg-[#1c1b1e] border-none mb-2 p-3 text-white">
@@ -69,6 +73,8 @@ export default function NewMsg() {
 						<DialogTitle>Please select a Contact</DialogTitle>
 						<DialogDescription></DialogDescription>
 					</DialogHeader>
+
+					{/* Search Input */}
 					<div>
 						<Input
 							placeholder="Search Contacts"
@@ -76,46 +82,53 @@ export default function NewMsg() {
 							onChange={(e) => searchContacts(e.target.value)}
 						/>
 					</div>
+
+					{/* Scrollable Contacts List */}
 					<ScrollArea className="h-[250px]">
 						<div className="flex flex-col gap-5">
 							{searchedContacts.map((contact) => (
 								<div
-									key={contact.user_id}
-									className="flex gap-3 items-center cursor-pointer "
+									key={contact._id}
+									className="flex gap-3 items-center cursor-pointer"
+									onClick={() => selectNewContact(contact)}
 								>
-									<div className="w-12 h-12 relative">
-										<Avatar className="h-12 w-12 rounded-full overflow-hidden">
-											{contact.image ? (
-												<AvatarImage
-													src={`http://localhost:8080/${contact.image}`}
-													alt="profile"
-													className="object-cover w-full h-full bg-black"
-												/>
-											) : (
-												<div
-													className={`uppercase h-12 w-12  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
-														contact.color
-													)}`}
-												>
-													{contact.first_name
-														? contact.first_name.split("").shift()
-														: contact.email.split("").shift()}
-												</div>
-											)}
-										</Avatar>
-										<div className="flex gap-5">
-											<span>
-												{contact.first_name && contact.last_name
-													? `${contact.first_name}${contact.last_name}`
-													: ""}
-											</span>
-											<span className="text-xs">{contact.email}</span>
-										</div>
+									<Avatar className="h-12 w-12 rounded-full overflow-hidden">
+										{contact.image ? (
+											<AvatarImage
+												src={`http://localhost:8080/${contact.image}`}
+												alt="profile"
+												className="object-cover w-full h-full bg-black"
+											/>
+										) : (
+											<div
+												className={`uppercase h-12 w-12 text-lg border flex items-center justify-center rounded-full ${getColor(
+													contact.color
+												)}`}
+											>
+												{contact.first_name
+													? contact.first_name[0]
+													: contact.email[0]}
+											</div>
+										)}
+									</Avatar>
+
+									{/* Name & Email */}
+									<div className="flex flex-col">
+										<span className="font-medium text-sm">
+											{contact.first_name && contact.last_name
+												? `${contact.first_name} ${contact.last_name}`
+												: contact.email}
+										</span>
+										<span className="text-xs text-gray-400">
+											{contact.email}
+										</span>
 									</div>
 								</div>
 							))}
 						</div>
 					</ScrollArea>
+
+					{/* No Contacts Found */}
 					{searchedContacts.length <= 0 && (
 						<div className="flex items-center justify-center mt-4 p-4 bg-[#2c2e3b] rounded-md border border-gray-700 text-gray-300 text-sm italic">
 							No contacts found
