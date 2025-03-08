@@ -3,6 +3,8 @@ import { RiCloseFill } from "react-icons/ri";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { getColor } from "@/lib/utils";
 
+const backend_url = import.meta.env.VITE_BACKEND_URL;
+
 export default function ChatHeader() {
 	const { closeChat, selectedChatData, selectedChatType } = useAppStore();
 
@@ -13,7 +15,7 @@ export default function ChatHeader() {
 					<Avatar className="h-12 w-12 rounded-full overflow-hidden">
 						{selectedChatData.image ? (
 							<AvatarImage
-								src={`http://localhost:8080/${selectedChatData.image}`}
+								src={`${backend_url}/${selectedChatData.image}`}
 								alt="profile"
 								className="object-cover w-full h-full bg-black"
 							/>
