@@ -145,10 +145,10 @@ export const loginUser = async (req, res, next) => {
 
 export const getUserInfo = async (req, res, next) => {
 	try {
-		console.log("Inside getUserInfo");
+		//console.log("Inside getUserInfo");
 		//console.log(req.cookies);
 		//console.log(req.cookies.jwt);
-		console.log("Request body", req.user_id);
+		//console.log("Request body", req.user_id);
 		const user = await User.findById(req.user_id);
 
 		if (!user) {

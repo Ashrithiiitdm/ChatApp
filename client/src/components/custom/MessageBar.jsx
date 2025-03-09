@@ -5,12 +5,20 @@ import { GrAttachment } from "react-icons/gr";
 import { IoSend } from "react-icons/io5";
 import { RiEmojiStickerLine } from "react-icons/ri";
 import { useSocket } from "@/context/Socket.jsx";
+import axiosInstance from "@/utils/axios";
 
 export default function MessageBar() {
 	const [message, setMessage] = useState("");
 	const socket = useSocket();
-	const { selectedChatType, selectedChatData, userInfo } = useAppStore();
+	const {
+		selectedChatType,
+		selectedChatData,
+		userInfo,
+		setIsUploading,
+		setFileUploadProgress,
+	} = useAppStore();
 	const emojiRef = useRef();
+	const fileInput = useRef();
 	const [emojiOpen, setEmojiOpen] = useState(false);
 
 	useEffect(() => {
@@ -41,6 +49,50 @@ export default function MessageBar() {
 		}
 	};
 
+	const handleAttachmentClick = () => {
+		if (fileInput.current) {
+			fileInput.current.click();
+		}
+	};
+
+	const handleAttachmentChange = async (event) => {
+		try {
+			const file = event.target.files[0];
+			if (file) {
+				const formData = new FormData();
+				formData.append("file", file);
+				setIsUploading(true);
+				const response = await axiosInstance.post(
+					"/messages/uploadFiles",
+					formData,
+					{
+						withCredentials: true,
+						onUploadProgess: (data) => {
+							setFileUploadProgress(
+								Math.round((100 * data.loaded) / data.total)
+							);
+						},
+					}
+				);
+				if (response.status === 200 && response.data) {
+					setIsUploading(false);
+					if (selectedChatType === "contact") {
+						socket.emit("sendMessage", {
+							sender: userInfo.user_id,
+							content: undefined,
+							receiver: selectedChatData._id,
+							message_type: "file",
+							file_url: response.data.file_url,
+						});
+					}
+				}
+			}
+		} catch (err) {
+			setIsUploading(false);
+			console.log(err);
+		}
+	};
+
 	return (
 		<div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-6 gap-6">
 			<div className="flex-1 flex bg-[#2a2b33] rounded-md items-center gap-5 pr-5">
@@ -51,10 +103,18 @@ export default function MessageBar() {
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
 				/>
-				<button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all">
+				<button
+					onClick={handleAttachmentClick}
+					className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+				>
 					<GrAttachment className="text-2xl" />
 				</button>
-
+				<input
+					type="file"
+					className="hidden"
+					ref={fileInput}
+					onChange={handleAttachmentChange}
+				/>
 				<div className="relative">
 					<button
 						onClick={() => setEmojiOpen(true)}

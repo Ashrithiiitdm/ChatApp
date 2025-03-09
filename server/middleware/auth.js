@@ -17,7 +17,7 @@ export const verifyToken = (req, res, next) => {
 				message: "Token is invalid",
 			});
 		}
-		console.log("Decoded", decoded);
+		//console.log("Decoded", decoded);
 		req.user_id = decoded.user_id;
 		next();
 	});
