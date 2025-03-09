@@ -44,7 +44,7 @@ export default function MessageContainer() {
 				getMessages();
 			}
 		}
-	}, [selectedChatData, selectedChatType, selectedChatMessages]);
+	}, [selectedChatData, selectedChatType]);
 
 	useEffect(() => {
 		if (scrollRef.current) {
