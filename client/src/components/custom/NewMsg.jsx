@@ -29,7 +29,7 @@ export default function NewMsg() {
 		try {
 			if (contact.length > 0) {
 				const response = await axios.post(
-					"/contacts/searchContacts",
+					"/api/contacts/searchContacts",
 					{ contact },
 					{ withCredentials: true }
 				);

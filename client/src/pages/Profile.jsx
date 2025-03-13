@@ -52,7 +52,7 @@ export default function Profile() {
 
 		try {
 			const response = await axios.post(
-				"/auth/updateProfile",
+				"/api/auth/updateProfile",
 				{ firstName, lastName, color: selectedColor },
 				{ withCredentials: true }
 			);
@@ -88,7 +88,7 @@ export default function Profile() {
 		if (file) {
 			const formData = new FormData();
 			formData.append("profile-image", file);
-			const response = await axios.post("/auth/uploadImage", formData, {
+			const response = await axios.post("/api/auth/uploadImage", formData, {
 				withCredentials: true,
 			});
 
@@ -108,7 +108,7 @@ export default function Profile() {
 
 	const handleRemoveImage = async () => {
 		try {
-			const response = await axios.delete("/auth/removeImage", {
+			const response = await axios.delete("/api/auth/removeImage", {
 				withCredentials: true,
 			});
 

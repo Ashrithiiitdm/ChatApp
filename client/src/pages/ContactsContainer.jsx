@@ -16,7 +16,7 @@ export default function ContactsContainer() {
 
 	useEffect(() => {
 		const getContacts = async () => {
-			const response = await axios.get("/contacts/getContacts", {
+			const response = await axios.get("/api/contacts/getContacts", {
 				withCredentials: true,
 			});
 			console.log("In ContactContainer", response);
@@ -27,7 +27,7 @@ export default function ContactsContainer() {
 		getContacts();
 
 		const getChannels = async () => {
-			const response = await axios.get("/channels/getUserChannels", {
+			const response = await axios.get("/api/channels/getUserChannels", {
 				withCredentials: true,
 			});
 

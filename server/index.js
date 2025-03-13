@@ -32,10 +32,10 @@ app.use(
 	})
 );
 
-app.use("/auth", authRouter);
-app.use("/contacts", contactRoutes);
-app.use("/messages", msgRouter);
-app.use("/channels", channelRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/contacts", contactRoutes);
+app.use("/api/messages", msgRouter);
+app.use("/api/channels", channelRouter);
 
 const port = process.env.PORT || 5000;
 

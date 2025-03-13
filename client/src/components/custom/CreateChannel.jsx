@@ -15,9 +15,6 @@ import {
 } from "@/components/ui/dialog.jsx";
 import { Input } from "../ui/input.jsx";
 import axios from "@/utils/axios.js";
-import { ScrollArea } from "../ui/scroll-area.jsx";
-import { Avatar, AvatarImage } from "../ui/avatar.jsx";
-import { getColor } from "@/lib/utils.js";
 import { useAppStore } from "@/store/app.js";
 import { Button } from "../ui/button.jsx";
 import MultipleSelector from "../ui/mutliselect.jsx";
@@ -33,7 +30,7 @@ export default function CreateChannel() {
 
 	useEffect(() => {
 		const getData = async () => {
-			const response = await axios.get("/contacts/getAllContacts", {
+			const response = await axios.get("/api/contacts/getAllContacts", {
 				withCredentials: true,
 			});
 
@@ -47,20 +44,22 @@ export default function CreateChannel() {
 	const createChannel = async () => {
 		try {
 			if (channelName.length > 0 && selectedContacts.length > 0) {
-				const response = await axios.post("/channels/createChannel", {
-					name: channelName,
-					members: selectedContacts.map((contact) => contact.value),
-				}, {withCredentials: true});
-			
-                if(response.status === 200){
-                    setChannelName("");
-                    setSelectedContacts([]);
-                    setNewChannelModal(false);
-                    addChannel(response.data.channel);
-                }
+				const response = await axios.post(
+					"/api/channels/createChannel",
+					{
+						name: channelName,
+						members: selectedContacts.map((contact) => contact.value),
+					},
+					{ withCredentials: true }
+				);
 
-            }
-
+				if (response.status === 200) {
+					setChannelName("");
+					setSelectedContacts([]);
+					setNewChannelModal(false);
+					addChannel(response.data.channel);
+				}
+			}
 		} catch (err) {
 			console.log(err);
 		}

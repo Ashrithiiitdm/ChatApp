@@ -72,7 +72,7 @@ export default function MessageBar() {
 				formData.append("file", file);
 				setIsUploading(true);
 				const response = await axiosInstance.post(
-					"/messages/uploadFiles",
+					"/api/messages/uploadFiles",
 					formData,
 					{
 						withCredentials: true,

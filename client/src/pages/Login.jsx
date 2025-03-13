@@ -62,7 +62,7 @@ export default function Login() {
 
 		try {
 			const response = await axios.post(
-				"/auth/signup",
+				"/api/auth/signup",
 				{ email, password },
 				{ withCredentials: true }
 			);
@@ -87,7 +87,7 @@ export default function Login() {
 
 		try {
 			const response = await axios.post(
-				"/auth/login",
+				"/api/auth/login",
 				{ email, password },
 				{ withCredentials: true }
 			);

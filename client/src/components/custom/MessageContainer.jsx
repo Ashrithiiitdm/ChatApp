@@ -4,7 +4,6 @@ import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { MdFolderZip } from "react-icons/md";
 import { IoMdArrowDown } from "react-icons/io";
-import axiosInstance from "@/utils/axios.js";
 import { IoCloseSharp } from "react-icons/io5";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getColor } from "@/lib/utils";
@@ -29,7 +28,7 @@ export default function MessageContainer() {
 		const getMessages = async () => {
 			try {
 				const response = await axios.post(
-					"/messages/getMessages",
+					"/api/messages/getMessages",
 					{ user_id: selectedChatData._id },
 					{ withCredentials: true }
 				);
@@ -45,7 +44,7 @@ export default function MessageContainer() {
 		const getChannelMessages = async () => {
 			try {
 				const response = await axios.get(
-					`channels/getChannelMessages/${selectedChatData._id}`,
+					`/api/channels/getChannelMessages/${selectedChatData._id}`,
 					{ withCredentials: true }
 				);
 
@@ -81,7 +80,7 @@ export default function MessageContainer() {
 	const downloadFile = async (file_url) => {
 		setIsDownloading(true);
 		setFileDownloadProgress(0);
-		const response = await axiosInstance.get(`${backend_url}/${file_url}`, {
+		const response = await axios.get(`${backend_url}/api/${file_url}`, {
 			responseType: "blob",
 			onDownloadProgress: (progessEvent) => {
 				const { loaded, total } = progessEvent;
