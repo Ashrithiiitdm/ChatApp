@@ -80,7 +80,7 @@ export default function MessageContainer() {
 	const downloadFile = async (file_url) => {
 		setIsDownloading(true);
 		setFileDownloadProgress(0);
-		const response = await axios.get(`${backend_url}/api/${file_url}`, {
+		const response = await axios.get(`${backend_url}/${file_url}`, {
 			responseType: "blob",
 			onDownloadProgress: (progessEvent) => {
 				const { loaded, total } = progessEvent;

@@ -31,7 +31,7 @@ export default function App() {
 		const getUserData = async () => {
 			try {
 				console.log("In getUserData");
-				const response = await axios.get(`${backend_url}/auth/userInfo`, {
+				const response = await axios.get(`${backend_url}/api/auth/userInfo`, {
 					withCredentials: true,
 				});
 				console.log("Response in useEffect", response);
