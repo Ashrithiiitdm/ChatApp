@@ -2,11 +2,11 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import { renameSync, unlinkSync } from "fs";
+import { v2 as cloudinary } from "cloudinary";
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 const signToken = (email, user_id) => {
-	console.log("In signToken", email, user_id);
+	// console.log("In signToken", email, user_id);
 	return jwt.sign({ email, user_id }, process.env.JWT_SECRET, {
 		expiresIn: maxAge,
 	});
@@ -15,7 +15,7 @@ const signToken = (email, user_id) => {
 export const regUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
-		console.log("In regUser:", email, password);
+		// console.log("In regUser:", email, password);
 
 		if (!email) {
 			return res.status(400).json({
@@ -104,14 +104,14 @@ export const loginUser = async (req, res, next) => {
 		}
 
 		const match = await bcrypt.compare(password, user.password);
-		console.log("Match", match);
+		// console.log("Match", match);
 		if (!match) {
 			return res.status(401).json({
 				message: "Invalid credentials",
 			});
 		}
 
-		console.log("id", user.id);
+		// console.log("id", user.id);
 
 		// In your login/registration endpoint:
 		const cookieOptions = {
@@ -225,75 +225,75 @@ export const updateProfile = async (req, res, next) => {
 	}
 };
 
-export const updateProfileImage = async (req, res, next) => {
+export const updateProfileImage = async (req, res) => {
 	try {
 		if (!req.file) {
-			return res.status(400).json({
-				message: "File is required",
-			});
+			return res.status(400).json({ message: "No file uploaded" });
 		}
 
-		const date = Date.now();
-		let fileName = "uploads/profiles/" + date + req.file.originalname;
-		renameSync(req.file.path, fileName);
-
-		const updateUser = await User.findByIdAndUpdate(
-			req.user_id,
-			{
-				image: fileName,
-			},
-			{ new: true, runValidators: true }
-		);
-
-		if (!updateUser) {
-			return res.status(404).json({
-				message: "User not found",
-			});
-		}
-
-		return res.status(200).json({
-			email: updateUser.email,
-			user_id: updateUser.id,
-			profileSetup: updateUser.profileSetup,
-			first_name: updateUser.first_name,
-			last_name: updateUser.last_name,
-			image: updateUser.image,
-			color: updateUser.color,
-		});
-	} catch (err) {
-		console.log(err);
-		return res.status(500).json({
-			message: "Internal server error",
-		});
-	}
-};
-
-export const removeProfileImage = async (req, res, next) => {
-	try {
 		const { user_id } = req;
 		const user = await User.findById(user_id);
+
 		if (!user) {
-			return res.status(404).json({
-				message: "User not found",
-			});
+			return res.status(404).json({ message: "User not found" });
 		}
 
 		if (user.image) {
-			unlinkSync(user.image);
+			const public_id = user.image.split("/").pop().split(".")[0];
+			await cloudinary.uploader.destroy(public_id);
 		}
 
-		user.image = null;
+		const result = await new Promise((resolve, reject) => {
+			const stream = cloudinary.uploader.upload_stream(
+				{
+					folder: `${user_id}/profile`,
+					public_id: req.file.originalname.split(".")[0],
+					resource_type: "image",
+				},
+				(error, result) => {
+					if (error) reject(error);
+					else resolve(result);
+				}
+			);
+			stream.end(req.file.buffer);
+		});
 
+		user.image = result.secure_url;
 		await user.save();
 
 		return res.status(200).json({
-			message: "Profile image removed successfully",
+			message: "Profile image updated successfully",
+			image: result.secure_url,
 		});
 	} catch (err) {
-		console.log(err);
-		return res.status(500).json({
-			message: "Internal server error",
-		});
+		console.error(err);
+		return res.status(500).json({ message: "Internal server error" });
+	}
+};
+
+export const removeProfileImage = async (req, res) => {
+	try {
+		const { user_id } = req;
+		const user = await User.findById(user_id);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		if (user.image) {
+			const public_id = user.image.split("/").pop().split(".")[0];
+			await cloudinary.uploader.destroy(public_id);
+		}
+
+		user.image = "";
+		await user.save();
+
+		return res
+			.status(200)
+			.json({ message: "Profile image removed successfully" });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: "Internal server error" });
 	}
 };
 

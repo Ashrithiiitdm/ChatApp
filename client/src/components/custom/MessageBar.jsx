@@ -67,6 +67,7 @@ export default function MessageBar() {
 	const handleAttachmentChange = async (event) => {
 		try {
 			const file = event.target.files[0];
+			// console.log({ file });
 			if (file) {
 				const formData = new FormData();
 				formData.append("file", file);
@@ -76,7 +77,7 @@ export default function MessageBar() {
 					formData,
 					{
 						withCredentials: true,
-						onUploadProgess: (data) => {
+						onUploadProgress: (data) => {
 							setFileUploadProgress(
 								Math.round((100 * data.loaded) / data.total)
 							);

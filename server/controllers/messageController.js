@@ -1,5 +1,6 @@
 import { Messages } from "../models/Messages.js";
 import { mkdir, mkdirSync, renameSync } from "fs";
+import { v2 as cloudinary } from "cloudinary";
 
 export const getMessages = async (req, res) => {
 	try {
@@ -33,28 +34,38 @@ export const getMessages = async (req, res) => {
 export const uploadFiles = async (req, res) => {
 	try {
 		if (!req.file) {
-			return res.status(400).json({
-				message: "File is required",
-			});
+			return res.status(400).json({ message: "No file uploaded" });
 		}
 
-		const date = Date.now();
+		const { user_id } = req;
+		// console.log(req.file);
+		// console.log("File Name:", req.file.originalname);
+		// console.log("MIME Type:", req.file.mimetype);
+		// console.log("Buffer Size:", req.file.buffer?.length || 0);
 
-		let fileDir = `uploads/files/${date}`;
-		const file = req.file;
+		// const fileBuffer = req.file.buffer;
+		// console.log({ fileBuffer });
 
-		let fileName = `${fileDir}/${req.file.originalname}`;
-		mkdirSync(fileDir, { recursive: true });
-
-		renameSync(req.file.path, fileName);
+		const result = await new Promise((resolve, reject) => {
+			const stream = cloudinary.uploader.upload_stream(
+				{
+					folder: `${user_id}/messages`,
+					public_id: req.file.originalname.split(".")[0],
+					resource_type: "auto",
+				},
+				(error, result) => {
+					if (error) reject(error);
+					else resolve(result);
+				}
+			);
+			stream.end(req.file.buffer);
+		});
 
 		return res.status(200).json({
-			file_url: fileName,
+			file_url: result.secure_url,
 		});
-	} catch (err) {
-		console.log(err);
-		return res.status(500).json({
-			message: "Internal server error",
-		});
+	} catch (error) {
+		console.log("Error", error);
+		res.status(500).json({ message: "File upload failed" });
 	}
 };

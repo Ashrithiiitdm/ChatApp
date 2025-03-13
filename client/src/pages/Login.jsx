@@ -66,7 +66,7 @@ export default function Login() {
 				{ email, password },
 				{ withCredentials: true }
 			);
-			console.log(response);
+			// console.log(response);
 
 			if (response.status === 201) {
 				setUserInfo(response.data.user);
@@ -94,7 +94,7 @@ export default function Login() {
 
 			if (response.data.user.user_id) {
 				toast.success("Login successful");
-				console.log(response.data.user);
+				// console.log(response.data.user);
 				setUserInfo(response.data.user);
 				if (response.data.user.profileSetup) {
 					navigate("/chat");

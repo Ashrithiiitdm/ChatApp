@@ -12,8 +12,6 @@ import { IoLogOut } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import axios from "@/utils/axios.js";
 
-const backend_url = import.meta.env.VITE_BACKEND_URL;
-
 export default function ProfileInfo() {
 	const { userInfo, setUserInfo } = useAppStore();
 	const navigate = useNavigate();
@@ -29,6 +27,7 @@ export default function ProfileInfo() {
 			if (response.status === 200) {
 				navigate("/auth");
 				setUserInfo(null);
+				useAppStore.getState().resetChatState();
 			}
 		} catch (err) {
 			console.log(err);
@@ -41,7 +40,7 @@ export default function ProfileInfo() {
 				<Avatar className="h-12 w-12 rounded-full overflow-hidden">
 					{userInfo.image ? (
 						<AvatarImage
-							src={`${backend_url}/${userInfo.image}`}
+							src={`${userInfo.image}`}
 							alt="profile"
 							className="object-cover w-full h-full bg-black"
 						/>

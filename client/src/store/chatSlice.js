@@ -90,4 +90,13 @@ export const createChatSlice = (set, get) => ({
 
 			return { directMessagesContacts: updatedContacts };
 		}),
+
+	resetChatState: () =>
+		set({
+			selectedChatType: undefined,
+			selectedChatData: undefined,
+			selectedChatMessages: [],
+			channels: [],
+			directMessagesContacts: [],
+		}),
 });

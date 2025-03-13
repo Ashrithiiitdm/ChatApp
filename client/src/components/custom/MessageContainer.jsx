@@ -7,7 +7,6 @@ import { IoMdArrowDown } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getColor } from "@/lib/utils";
-const backend_url = import.meta.env.VITE_BACKEND_URL;
 
 export default function MessageContainer() {
 	const scrollRef = useRef(null);
@@ -63,7 +62,7 @@ export default function MessageContainer() {
 				getChannelMessages();
 			}
 		}
-	}, [selectedChatData, selectedChatType]);
+	}, [selectedChatData, selectedChatType, setSelectedChatMessages]);
 
 	useEffect(() => {
 		if (scrollRef.current) {
@@ -72,15 +71,16 @@ export default function MessageContainer() {
 	}, [selectedChatMessages]);
 
 	const checkImage = (file_url) => {
-		const imageRegex =
-			/\.(jpg|jpeg|png|gif|bmp|tiff|tif|webp|svg|ico|heic|heif)$/i;
+		// console.log(file_url);
+		const imageRegex = /\.(jpg|jpeg|png|gif|bmp|webp|svg|tiff|heif|heic)$/i;
 		return imageRegex.test(file_url);
 	};
 
 	const downloadFile = async (file_url) => {
 		setIsDownloading(true);
 		setFileDownloadProgress(0);
-		const response = await axios.get(`${backend_url}/${file_url}`, {
+		// console.log("File url:", file_url);
+		const response = await axios.get(`${file_url}`, {
 			responseType: "blob",
 			onDownloadProgress: (progessEvent) => {
 				const { loaded, total } = progessEvent;
@@ -136,7 +136,7 @@ export default function MessageContainer() {
 								className="cursor-pointer"
 							>
 								<img
-									src={`${backend_url}/${message.file_url}`}
+									src={`${message.file_url}`}
 									alt="file"
 									height={300}
 									width={300}
@@ -200,7 +200,7 @@ export default function MessageContainer() {
 								className="cursor-pointer"
 							>
 								<img
-									src={`${backend_url}/${message.file_url}`}
+									src={`${message.file_url}`}
 									alt="file"
 									height={300}
 									width={300}
@@ -227,7 +227,7 @@ export default function MessageContainer() {
 						<Avatar className="h-8 w-8 rounded-full overflow-hidden">
 							{message.sender.image && (
 								<AvatarImage
-									src={`${backend_url}/${message.sender.image}`}
+									src={`${message.sender.image}`}
 									alt="profile"
 									className="object-cover w-full h-full bg-black"
 								/>
@@ -284,10 +284,7 @@ export default function MessageContainer() {
 			{showImage && (
 				<div className="fixed z-[1000] top-0 left-0 h-[100vh] w-[100vw] flex items-center justify-center backdrop-blur-lg flex-col">
 					<div>
-						<img
-							src={`${backend_url}/${imageUrl}`}
-							className="h-[80vh] w-full bg-cover"
-						/>
+						<img src={`${imageUrl}`} className="h-[80vh] w-full bg-cover" />
 					</div>
 					<div className="flex gap-5 fixed top-0 mt-5">
 						<button

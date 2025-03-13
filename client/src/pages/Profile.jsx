@@ -19,6 +19,7 @@ export default function Profile() {
 	const [image, setImage] = useState(null);
 	const [hovered, setHovered] = useState(false);
 	const [selectedColor, setSelectedColor] = useState(0);
+	const [isUploading, setIsUploading] = useState(false);
 
 	const fileInput = useRef(null);
 	const backend_url = import.meta.env.VITE_BACKEND_URL;
@@ -31,7 +32,7 @@ export default function Profile() {
 		}
 
 		if (userInfo.image) {
-			setImage(`${backend_url}/${userInfo.image}`);
+			setImage(`${userInfo.image}`);
 		}
 	}, [userInfo]);
 
@@ -48,7 +49,7 @@ export default function Profile() {
 	};
 
 	const saveChanges = async () => {
-		if (!validateProfile()) return;
+		if (!validateProfile() || isUploading) return;
 
 		try {
 			const response = await axios.post(
@@ -83,26 +84,42 @@ export default function Profile() {
 	};
 
 	const handleImageChange = async (event) => {
-		const file = event.target.files[0];
-		// console.log({ file })
-		if (file) {
-			const formData = new FormData();
-			formData.append("profile-image", file);
-			const response = await axios.post("/api/auth/uploadImage", formData, {
-				withCredentials: true,
-			});
+		try {
+			const file = event.target.files[0];
+			// console.log({ file })
+			if (file) {
+				// console.log(file);
+				// console.log("File Size in Bytes:", file.size); // Debugging step
+				const sizeMB = file.size / (1024 * 1024);
+				// console.log("File Size in MB:", file.size / (1024 * 1024));
+				if (sizeMB > 100) {
+					toast.error("File size should be less than 100MB");
+					return;
+				}
 
-			if (response.status === 200 && response.data) {
-				setUserInfo({ ...userInfo, image: response.data.image });
-				toast.success("Profile pic updated successfully");
+				const formData = new FormData();
+				formData.append("profile-image", file);
+				setIsUploading(true);
+				const response = await axios.post("/api/auth/uploadImage", formData, {
+					withCredentials: true,
+				});
+
+				if (response.status === 200 && response.data) {
+					setUserInfo({ ...userInfo, image: response.data.image });
+					toast.success("Profile pic updated successfully");
+				}
+
+				const reader = new FileReader();
+				reader.onload = () => {
+					setImage(reader.result);
+				};
+
+				reader.readAsDataURL(file);
 			}
-
-			const reader = new FileReader();
-			reader.onload = () => {
-				setImage(reader.result);
-			};
-
-			reader.readAsDataURL(file);
+		} catch (err) {
+			console.log(err);
+		} finally {
+			setIsUploading(false);
 		}
 	};
 
