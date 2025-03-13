@@ -24,7 +24,7 @@ export default function NewMsg() {
 	const { setSelectedChatType, setSelectedChatData } = useAppStore();
 	const [openNewContactModal, setOpenNewContactModal] = useState(false);
 	const [searchedContacts, setSearchedContacts] = useState([]);
-
+	const backend_url = import.meta.env.VITE_BACKEND_URL;
 	const searchContacts = async (contact) => {
 		try {
 			if (contact.length > 0) {
@@ -95,7 +95,7 @@ export default function NewMsg() {
 									<Avatar className="h-12 w-12 rounded-full overflow-hidden">
 										{contact.image ? (
 											<AvatarImage
-												src={`http://localhost:8080/${contact.image}`}
+												src={`${backend_url}/${contact.image}`}
 												alt="profile"
 												className="object-cover w-full h-full bg-black"
 											/>

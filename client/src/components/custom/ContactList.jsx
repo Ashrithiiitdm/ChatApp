@@ -72,7 +72,11 @@ export default function ContactList({ contacts, isChannel = false }) {
 						{isChannel ? (
 							<span>{contact.name}</span>
 						) : (
-							<span>{`${contact.first_name} ${contact.last_name}`}</span>
+							<span>
+								{contact.first_name
+									? `${contact.first_name} ${contact.last_name}`
+									: contact.email}
+							</span>
 						)}
 					</div>
 				</div>

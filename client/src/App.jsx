@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "./components/ui/button";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Chat from "./pages/Chat.jsx";
@@ -26,17 +25,15 @@ const AuthRoute = ({ children }) => {
 export default function App() {
 	const { userInfo, setUserInfo } = useAppStore();
 	const [loading, setLoading] = useState(true);
+	const backend_url = import.meta.env.VITE_BACKEND_URL;
 
 	useEffect(() => {
 		const getUserData = async () => {
 			try {
 				console.log("In getUserData");
-				const response = await axios.get(
-					"http://localhost:8080/auth/userInfo",
-					{
-						withCredentials: true,
-					}
-				);
+				const response = await axios.get(`${backend_url}/auth/userInfo`, {
+					withCredentials: true,
+				});
 				console.log("Response in useEffect", response);
 				if (response.status === 200 && response.data.user_id) {
 					console.log(response.data);

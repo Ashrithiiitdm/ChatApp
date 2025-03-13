@@ -6,7 +6,7 @@ import { MdFolderZip } from "react-icons/md";
 import { IoMdArrowDown } from "react-icons/io";
 import axiosInstance from "@/utils/axios.js";
 import { IoCloseSharp } from "react-icons/io5";
-import { AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getColor } from "@/lib/utils";
 const backend_url = import.meta.env.VITE_BACKEND_URL;
 
@@ -41,9 +41,27 @@ export default function MessageContainer() {
 				console.log(err);
 			}
 		};
+
+		const getChannelMessages = async () => {
+			try {
+				const response = await axios.get(
+					`channels/getChannelMessages/${selectedChatData._id}`,
+					{ withCredentials: true }
+				);
+
+				if (response.data.messages) {
+					setSelectedChatMessages(response.data.messages);
+				}
+			} catch (err) {
+				console.log(err);
+			}
+		};
+
 		if (selectedChatData._id) {
 			if (selectedChatType === "contact") {
 				getMessages();
+			} else if (selectedChatType === "channel") {
+				getChannelMessages();
 			}
 		}
 	}, [selectedChatData, selectedChatType]);
@@ -161,9 +179,48 @@ export default function MessageContainer() {
 							message.sender._id === userInfo.user_id
 								? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
 								: "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
-						} border inline-block p-4 rounded my-1 max-w-[50%] break-words`}
+						} border inline-block p-4 rounded my-1 max-w-[50%] break-words ml-9`}
 					>
 						{message.content}
+					</div>
+				)}
+				{message.message_type === "file" && (
+					<div
+						className={`${
+							message.sender._id === userInfo.user_id
+								? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
+								: "bg-[#2a2b33]/5 text-white/80 border-[#ffffff]/20"
+						} border inline-block p-4 rounded my-1 max-w-[50%] break-words`}
+					>
+						{checkImage(message.file_url) ? (
+							<div
+								onClick={() => {
+									setshowImage(true);
+									setImageUrl(message.file_url);
+								}}
+								className="cursor-pointer"
+							>
+								<img
+									src={`${backend_url}/${message.file_url}`}
+									alt="file"
+									height={300}
+									width={300}
+								/>
+							</div>
+						) : (
+							<div className="flex items-center justify-center gap-4">
+								<span className="text-white/80 text-3xl bg-black/20 rounded-full p-3">
+									<MdFolderZip size={24} />
+								</span>
+								<span>{message.file_url.split("/").pop(".")}</span>
+								<span
+									onClick={() => downloadFile(message.file_url)}
+									className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
+								>
+									<IoMdArrowDown />
+								</span>
+							</div>
+						)}
 					</div>
 				)}
 				{message.sender._id !== userInfo.user_id ? (

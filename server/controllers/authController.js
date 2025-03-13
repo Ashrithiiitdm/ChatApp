@@ -191,12 +191,6 @@ export const updateProfile = async (req, res, next) => {
 			});
 		}
 
-		if (!color) {
-			return res.status(400).json({
-				message: "Color is required",
-			});
-		}
-
 		const user = await User.findByIdAndUpdate(
 			user_id,
 			{

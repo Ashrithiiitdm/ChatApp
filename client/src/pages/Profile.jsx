@@ -21,6 +21,7 @@ export default function Profile() {
 	const [selectedColor, setSelectedColor] = useState(0);
 
 	const fileInput = useRef(null);
+	const backend_url = import.meta.env.VITE_BACKEND_URL;
 
 	useEffect(() => {
 		if (userInfo.profileSetup) {
@@ -30,7 +31,7 @@ export default function Profile() {
 		}
 
 		if (userInfo.image) {
-			setImage(`http://localhost:8080/${userInfo.image}`);
+			setImage(`${backend_url}/${userInfo.image}`);
 		}
 	}, [userInfo]);
 
@@ -62,6 +63,7 @@ export default function Profile() {
 			}
 		} catch (err) {
 			console.log(err);
+			toast.error(err.response.data.message);
 		}
 	};
 
