@@ -19,7 +19,7 @@ export default function ContactsContainer() {
 			const response = await axios.get("/api/contacts/getContacts", {
 				withCredentials: true,
 			});
-			console.log("In ContactContainer", response);
+			// console.log("In ContactContainer", response);
 			if (response.data.contacts) {
 				setDirectMessagesContacts(response.data.contacts);
 			}

@@ -22,11 +22,11 @@ export const SocketProvider = ({ children }) => {
 			});
 
 			socket.current.on("connect", () => {
-				console.log("Connected to socket-server");
+				// console.log("Connected to socket-server");
 			});
 
 			const handleReceiveMessage = (message) => {
-				console.log("Handle receive message: ", message);
+				// console.log("Handle receive message: ", message);
 				const {
 					selectedChatData,
 					selectedChatType,
@@ -39,7 +39,7 @@ export const SocketProvider = ({ children }) => {
 					(selectedChatData._id === message.sender._id ||
 						selectedChatData._id === message.receiver._id)
 				) {
-					console.log("Message received: ", message);
+					// console.log("Message received: ", message);
 					addMessage(message);
 				}
 				addContactsInDMContacts(message);

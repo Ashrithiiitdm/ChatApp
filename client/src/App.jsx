@@ -30,13 +30,13 @@ export default function App() {
 	useEffect(() => {
 		const getUserData = async () => {
 			try {
-				console.log("In getUserData");
-				const response = await axios.get(`${backend_url}/api/auth/userInfo`, {
+				// console.log("In getUserData");
+				const response = await axios.get(`/api/auth/userInfo`, {
 					withCredentials: true,
 				});
-				console.log("Response in useEffect", response);
+				// console.log("Response in useEffect", response);
 				if (response.status === 200 && response.data.user_id) {
-					console.log(response.data);
+					//console.log(response.data);
 					setUserInfo(response.data);
 				} else {
 					setUserInfo(undefined);
@@ -46,11 +46,12 @@ export default function App() {
 
 				setUserInfo(undefined);
 			} finally {
+				// setUserInfo(undefined);
 				setLoading(false);
 			}
 		};
 		if (!userInfo) {
-			console.log(userInfo);
+			// console.log(userInfo);
 			getUserData();
 		} else {
 			setLoading(false);

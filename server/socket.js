@@ -26,9 +26,9 @@ export const setUpSocket = (server) => {
 	const sendMessage = async (message) => {
 		const senderSocketId = userSocketMap.get(message.sender);
 		const receiverSocketId = userSocketMap.get(message.receiver);
-		console.log("In sendMessage socket.js:", senderSocketId);
-		console.log("In sendMessage socket.js:", receiverSocketId);
-		console.log("In sendMessage socket.js:", message);
+		//console.log("In sendMessage socket.js:", senderSocketId);
+		//console.log("In sendMessage socket.js:", receiverSocketId);
+		//console.log("In sendMessage socket.js:", message);
 		const createdMessage = await Messages.create(message);
 
 		const msgData = await Messages.findById(createdMessage._id)
@@ -37,12 +37,12 @@ export const setUpSocket = (server) => {
 
 		console.log("In sendMessage socket.js:", msgData);
 		if (receiverSocketId) {
-			console.log("first if in sendMessage socket.js:", receiverSocketId);
+			//console.log("first if in sendMessage socket.js:", receiverSocketId);
 			io.to(receiverSocketId).emit("receiveMessage", msgData);
 		}
 
 		if (senderSocketId) {
-			console.log("second if in sendMessage socket.js:", senderSocketId);
+			//console.log("second if in sendMessage socket.js:", senderSocketId);
 			io.to(senderSocketId).emit("receiveMessage", msgData);
 		}
 	};
