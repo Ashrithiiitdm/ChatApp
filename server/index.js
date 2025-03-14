@@ -19,13 +19,13 @@ connectCloudinary();
 app.use(express.json());
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: process.env.ORIGIN,
 		methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 		credentials: true,
 	})
 );
 
-app.use("/uploads/profiles", express.static("uploads/profiles"));
+// app.use("/uploads/profiles", express.static("uploads/profiles"));
 // app.use("/uploads/files", express.static("uploads/files"));
 app.use(
 	cookieParser({
