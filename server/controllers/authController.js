@@ -57,9 +57,10 @@ export const regUser = async (req, res, next) => {
 
 		const cookieOptions = {
 			maxAge,
-			secure: true, // false in development (HTTP)
+			secure: true,
 			sameSite: "None",
 			httpOnly: true,
+			partitioned: true,
 		};
 
 		res.cookie("jwt", signToken(email, user.id), cookieOptions);
@@ -119,6 +120,7 @@ export const loginUser = async (req, res, next) => {
 			secure: true, // false in development (HTTP)
 			sameSite: "None",
 			httpOnly: true,
+			partitioned: true,
 		};
 
 		const p = res.cookie("jwt", signToken(email, user.id), cookieOptions);
