@@ -14,7 +14,7 @@ export const setUpSocket = (server) => {
 	const userSocketMap = new Map();
 
 	const disconnectUser = (socket) => {
-		console.log("Client disconnected: ", socket.id);
+		// console.log("Client disconnected: ", socket.id);
 		for (const [user_id, socket_id] of userSocketMap.entries()) {
 			if (socket_id === socket.id) {
 				userSocketMap.delete(user_id);
@@ -35,7 +35,7 @@ export const setUpSocket = (server) => {
 			.populate("sender", "id email first_name last_name image color")
 			.populate("receiver", "id email first_name last_name image color");
 
-		console.log("In sendMessage socket.js:", msgData);
+		//console.log("In sendMessage socket.js:", msgData);
 		if (receiverSocketId) {
 			//console.log("first if in sendMessage socket.js:", receiverSocketId);
 			io.to(receiverSocketId).emit("receiveMessage", msgData);
@@ -91,7 +91,7 @@ export const setUpSocket = (server) => {
 
 		if (user_id) {
 			userSocketMap.set(user_id, socket.id);
-			console.log("User connected: ", user_id, "socket id: ", socket.id);
+			// console.log("User connected: ", user_id, "socket id: ", socket.id);
 		} else {
 			console.log("User id not provided");
 		}
