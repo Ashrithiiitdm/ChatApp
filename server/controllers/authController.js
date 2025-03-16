@@ -301,7 +301,12 @@ export const removeProfileImage = async (req, res) => {
 
 export const logOutUser = async (req, res, next) => {
 	try {
-		res.cookie("jwt", "", { maxAge: 1, secure: true, sameSite: "None" });
+		res.cookie("jwt", "", {
+			maxAge: 1,
+			secure: true,
+			sameSite: "None",
+			partitioned: true,
+		});
 		return res.status(200).json({
 			message: "User logged out successfully",
 		});
