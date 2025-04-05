@@ -88,12 +88,19 @@ Check out the live demo 👉 [ChatApp](https://chat-app-jet-zeta-83.vercel.app)
    npm install
    ```
 
-   Create a `.env` file in the `server/` directory and add:
+   Create a `.env` file in the `client/` directory and add:
 
    ```env
     VITE_BACKEND_URL='http://localhost:8080'
    ```
 
+    Start the frontend server:
+  
+    ```bash
+    npm run dev
+    ```
+4. **Access the Application**
+   Open your browser and navigate to `http://localhost:5173` to access the chat application.
 
 
 ## 🚀 Usage
